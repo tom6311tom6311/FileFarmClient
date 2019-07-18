@@ -1,0 +1,20 @@
+@import "~slick-carousel/slick/slick.css";
+@import "~slick-carousel/slick/slick-theme.css";
+@import url("https://fonts.googleapis.com/css?family=Inconsolata:700");
+
+html, body {
+  height: 100%;
+}
+
+#Main {
+  height: 100%;
+}
+
+.main {
+  height: 100%;
+  background-color: aqua;
+  display: 'flex';
+  flex-direction: 'column';
+  align-items: 'center';
+  font-family:Arial;
+}
