@@ -1,6 +1,13 @@
 import { app, BrowserWindow } from 'electron';
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import { enableLiveReload } from 'electron-compile';
+import AppConfig from './const/AppConfig.const';
+import InternalEvent from './const/InternalEvent.const';
+import AppStore from './class/AppStore/AppStore.class';
+import EventEmitter from './class/EventEmitter/EventEmitter.class';
+import UiClient from './class/UiClient/UiClient.class';
+import LocalFolderManager from './class/LocalFolderManager/LocalFolderManager.class';
+
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -26,6 +33,10 @@ const createWindow = async () => {
     mainWindow.webContents.openDevTools({ mode: 'undocked' });
   }
 
+  mainWindow.webContents.on('did-finish-load', () => {
+    EventEmitter.emit(InternalEvent.WEB_CONTENT_READY);
+  });
+
   // Emitted when the window is closed.
   mainWindow.on('closed', () => {
     // Dereference the window object, usually you would store windows
@@ -33,6 +44,8 @@ const createWindow = async () => {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+
+  AppStore.updateAppWindow(mainWindow);
 };
 
 // This method will be called when Electron has finished
@@ -59,3 +72,6 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+LocalFolderManager.start();
+new UiClient().start(AppConfig.DEFAULT_SERVER_PORT);

@@ -1,7 +1,9 @@
+import { ipcRenderer } from 'electron';
 import React from 'react';
 import { CssBaseline } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import MockFolderItems from '../../const/mock/MockFolderItems.const';
+// import MockFolderItems from '../../const/mock/MockFolderItems.const';
+import InternalEvent from '../../const/InternalEvent.const';
 import TopBar from '../TopBar/TopBar.component';
 import Folder from '../../components/Folder/Folder.component';
 import Navi from '../Navi/Navi.component';
@@ -18,9 +20,29 @@ class Main extends React.Component {
     super();
     this.state = {
       currFolder: FOLDER.LOCAL,
-      folderItems: MockFolderItems.LOCAL,
+      folderItems: {
+        [FOLDER.LOCAL]: [],
+        [FOLDER.CLOUD]: [],
+      },
     };
     this.switchFolder = this.switchFolder.bind(this);
+    this.registerEvents = this.registerEvents.bind(this);
+  }
+
+  componentWillMount() {
+    this.registerEvents();
+  }
+
+  registerEvents() {
+    ipcRenderer.on(InternalEvent.LOCAL_FOLDER_CHANGED, (evt, { folderItems }) => {
+      this.setState(prevState => ({
+        ...prevState,
+        folderItems: {
+          ...prevState.folderItems,
+          [FOLDER.LOCAL]: folderItems,
+        },
+      }));
+    });
   }
 
   switchFolder(folder) {
@@ -28,7 +50,6 @@ class Main extends React.Component {
     this.setState(prevState => ({
       ...prevState,
       currFolder: folder,
-      folderItems: MockFolderItems[folder],
     }));
   }
 
@@ -39,7 +60,7 @@ class Main extends React.Component {
         <CssBaseline />
         <TopBar />
         <Folder
-          items={folderItems}
+          items={folderItems[currFolder]}
         />
         <Navi
           actions={[
