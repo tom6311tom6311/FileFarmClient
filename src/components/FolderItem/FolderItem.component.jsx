@@ -4,7 +4,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Button, Card, CardMedia, CardContent, CardActions, Typography } from '@material-ui/core';
 import FolderItemImageMapping from '../../const/FolderItemImageMapping.const';
 
-const styles = () => ({
+const styles = theme => ({
+  badgePadding: {
+    padding: theme.spacing(0, 2),
+  },
   card: {
     height: '100%',
     display: 'flex',
@@ -16,6 +19,7 @@ const styles = () => ({
   cardMedia: {
     width: '60%',
     margin: 'auto',
+    marginTop: '10px',
     backgroundSize: '80%',
     paddingTop: '56.25%', // 16:9
   },
@@ -31,37 +35,24 @@ const styles = () => ({
   },
 });
 
-const FolderItem = ({ fileName, type, uploaded }) => {
+const FolderItem = ({ fileName, type }) => {
   const classes = makeStyles(styles)();
   return (
     <Card className={classes.card}>
       <CardMedia
-        className={[classes.cardMedia, uploaded ? classes.cardFade : undefined]}
+        className={classes.cardMedia}
         image={`${__dirname}/../../assets/folder_item/${FolderItemImageMapping[type] || 'UNKNOWN'}.png`}
         title={fileName}
       />
-      <CardContent className={[classes.cardContent, uploaded ? classes.cardFade : undefined]}>
+      <CardContent className={classes.cardContent}>
         <Typography gutterBottom variant="subtitle1" align="center" display="block">
           {fileName}
         </Typography>
       </CardContent>
       <CardActions className={classes.cardActions}>
-        {
-          uploaded ?
-          (
-            <Button size="large" color="primary" className={classes.cardButton}>
-              DOWNLOAD
-            </Button>
-          )
-          :
-          (
-            <Button size="large" color="secondary" className={classes.cardButton}>
-              UPLOAD
-            </Button>
-          )
-        }
-
-        
+        <Button size="large" color="primary" className={classes.cardButton}>
+          DOWNLOAD
+        </Button>
       </CardActions>
     </Card>
   );
@@ -70,7 +61,6 @@ const FolderItem = ({ fileName, type, uploaded }) => {
 FolderItem.propTypes = {
   fileName: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
-  uploaded: PropTypes.bool.isRequired,
 };
 
 export default FolderItem;
