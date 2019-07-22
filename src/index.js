@@ -7,6 +7,7 @@ import AppStore from './class/AppStore/AppStore.class';
 import EventEmitter from './class/EventEmitter/EventEmitter.class';
 import UiClient from './class/UiClient/UiClient.class';
 import LocalFolderManager from './class/LocalFolderManager/LocalFolderManager.class';
+import CloudFolderManager from './class/CloudFolderManager/CloudFolderManager.class';
 
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -74,4 +75,5 @@ app.on('activate', () => {
 // code. You can also put them in separate files and import them here.
 
 LocalFolderManager.start();
+CloudFolderManager.start();
 new UiClient().start(AppConfig.DEFAULT_SERVER_PORT);

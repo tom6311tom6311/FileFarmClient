@@ -42,7 +42,7 @@ class LocalFolderManager {
 
   onFileAdded(path) {
     const fileName = `${Path.basename(path)}`;
-    const type = (Path.extname(path) || '.').substr(1);
+    const type = (Path.extname(path) || '.').substr(1).toLowerCase();
     this.files[fileName] = { fileName, type };
     this.inFormFolderChanges();
   }

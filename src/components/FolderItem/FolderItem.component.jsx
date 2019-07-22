@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import { Button, Card, CardMedia, CardContent, CardActions, Typography } from '@material-ui/core';
+import { Card, CardMedia, CardContent, Typography } from '@material-ui/core';
 import FolderItemImageMapping from '../../const/FolderItemImageMapping.const';
 
 const styles = theme => ({
@@ -27,18 +27,18 @@ const styles = theme => ({
     flexGrow: 1,
     padding: '4px',
   },
-  cardActions: {
-    padding: '4px',
-  },
-  cardButton: {
-    margin: 'auto',
-  },
+  // cardActions: {
+  //   padding: '4px',
+  // },
+  // cardButton: {
+  //   margin: 'auto',
+  // },
 });
 
-const FolderItem = ({ fileName, type }) => {
+const FolderItem = ({ fileName, type, onContextMenu }) => {
   const classes = makeStyles(styles)();
   return (
-    <Card className={classes.card}>
+    <Card className={classes.card} onContextMenu={onContextMenu}>
       <CardMedia
         className={classes.cardMedia}
         image={`${__dirname}/../../assets/folder_item/${FolderItemImageMapping[type] || 'UNKNOWN'}.png`}
@@ -49,11 +49,11 @@ const FolderItem = ({ fileName, type }) => {
           {fileName}
         </Typography>
       </CardContent>
-      <CardActions className={classes.cardActions}>
+      {/* <CardActions className={classes.cardActions}>
         <Button size="large" color="primary" className={classes.cardButton}>
           DOWNLOAD
         </Button>
-      </CardActions>
+      </CardActions> */}
     </Card>
   );
 };
@@ -61,6 +61,11 @@ const FolderItem = ({ fileName, type }) => {
 FolderItem.propTypes = {
   fileName: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
+  onContextMenu: PropTypes.func,
+};
+
+FolderItem.defaultProps = {
+  onContextMenu: () => {},
 };
 
 export default FolderItem;

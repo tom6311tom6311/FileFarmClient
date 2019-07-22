@@ -1,6 +1,6 @@
 import { ipcRenderer } from 'electron';
 import React from 'react';
-import { CssBaseline } from '@material-ui/core';
+import { CssBaseline, Popover, List, ListItem, ListItemText } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 // import MockFolderItems from '../../const/mock/MockFolderItems.const';
 import InternalEvent from '../../const/InternalEvent.const';
@@ -24,13 +24,44 @@ class Main extends React.Component {
         [FOLDER.LOCAL]: [],
         [FOLDER.CLOUD]: [],
       },
+      popoverAnchor: null,
+      currFocusedFileName: '',
     };
     this.switchFolder = this.switchFolder.bind(this);
     this.registerEvents = this.registerEvents.bind(this);
+    this.onContextMenu = this.onContextMenu.bind(this);
+    this.onPopoverClose = this.onPopoverClose.bind(this);
+    this.uploadFile = this.uploadFile.bind(this);
+    this.deleteFile = this.deleteFile.bind(this);
+    this.downloadFile = this.downloadFile.bind(this);
   }
 
   componentWillMount() {
     this.registerEvents();
+  }
+
+  onContextMenu(popoverAnchor, fileName) {
+    this.setPopoverAnchor(popoverAnchor);
+    this.setFocusedFileName(fileName);
+  }
+
+  onPopoverClose() {
+    this.setPopoverAnchor(null);
+    this.setFocusedFileName('');
+  }
+
+  setPopoverAnchor(popoverAnchor) {
+    this.setState(prevState => ({
+      ...prevState,
+      popoverAnchor,
+    }));
+  }
+
+  setFocusedFileName(currFocusedFileName) {
+    this.setState(prevState => ({
+      ...prevState,
+      currFocusedFileName,
+    }));
   }
 
   registerEvents() {
@@ -40,6 +71,15 @@ class Main extends React.Component {
         folderItems: {
           ...prevState.folderItems,
           [FOLDER.LOCAL]: folderItems,
+        },
+      }));
+    });
+    ipcRenderer.on(InternalEvent.CLOUD_FOLDER_CHANGED, (evt, { folderItems }) => {
+      this.setState(prevState => ({
+        ...prevState,
+        folderItems: {
+          ...prevState.folderItems,
+          [FOLDER.CLOUD]: folderItems,
         },
       }));
     });
@@ -53,15 +93,72 @@ class Main extends React.Component {
     }));
   }
 
+  uploadFile(fileName) {
+    ipcRenderer.send(InternalEvent.UPLOAD_FILE, { fileName });
+    this.onPopoverClose();
+  }
+
+  deleteFile(fileName) {
+    ipcRenderer.send(InternalEvent.DELETE_FILE, { fileName });
+    this.onPopoverClose();
+  }
+
+  downloadFile(fileName) {
+    ipcRenderer.send(InternalEvent.DOWNLOAD_FILE, { fileName });
+    this.onPopoverClose();
+  }
+
   render() {
-    const { currFolder, folderItems } = this.state;
+    const { currFolder, folderItems, popoverAnchor, currFocusedFileName } = this.state;
     return (
       <React.Fragment>
         <CssBaseline />
         <TopBar />
         <Folder
           items={folderItems[currFolder]}
+          onContextMenu={this.onContextMenu}
         />
+        <Popover
+          open={popoverAnchor !== null}
+          anchorEl={popoverAnchor}
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'left',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+          onClose={this.onPopoverClose}
+          disableRestoreFocus
+        >
+          <List component="nav">
+            {
+              currFolder === FOLDER.LOCAL
+              && (
+                <ListItem button onClick={() => { this.uploadFile(currFocusedFileName); }}>
+                  <ListItemText primary="Upload" />
+                </ListItem>
+              )
+            }
+            {
+              currFolder === FOLDER.LOCAL
+              && (
+                <ListItem button onClick={() => { this.deleteFile(currFocusedFileName); }}>
+                  <ListItemText primary="Delete" />
+                </ListItem>
+              )
+            }
+            {
+              currFolder === FOLDER.CLOUD
+              && (
+                <ListItem button onClick={() => { this.downloadFile(currFocusedFileName); }}>
+                  <ListItemText primary="Download" />
+                </ListItem>
+              )
+            }
+          </List>
+        </Popover>
         <Navi
           actions={[
             {

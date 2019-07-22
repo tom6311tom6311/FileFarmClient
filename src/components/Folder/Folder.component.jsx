@@ -13,7 +13,7 @@ const styles = theme => ({
   },
 });
 
-const Folder = ({ items }) => {
+const Folder = ({ items, onContextMenu }) => {
   const classes = makeStyles(styles)();
   return (
     <Container className={classes.cardGrid} maxWidth="md">
@@ -23,6 +23,7 @@ const Folder = ({ items }) => {
             <FolderItem
               fileName={fileName}
               type={type}
+              onContextMenu={(evt) => { onContextMenu(evt.currentTarget, fileName); }}
             />
           </Grid>
         ))}
@@ -36,10 +37,12 @@ Folder.propTypes = {
     fileName: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
   })),
+  onContextMenu: PropTypes.func,
 };
 
 Folder.defaultProps = {
   items: [],
+  onContextMenu: () => {},
 };
 
 export default Folder;
