@@ -18,11 +18,12 @@ const Folder = ({ items, onContextMenu }) => {
   return (
     <Container className={classes.cardGrid} maxWidth="md">
       <Grid container spacing={2}>
-        {items.map(({ fileName, type }) => (
+        {items.map(({ fileName, type, hasError }) => (
           <Grid item key={fileName} xs={12} sm={3} md={4}>
             <FolderItem
               fileName={fileName}
               type={type}
+              hasError={hasError}
               onContextMenu={(evt) => { onContextMenu(evt.currentTarget, fileName); }}
             />
           </Grid>
@@ -36,6 +37,7 @@ Folder.propTypes = {
   items: PropTypes.arrayOf(PropTypes.shape({
     fileName: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
+    hasError: PropTypes.bool,
   })),
   onContextMenu: PropTypes.func,
 };

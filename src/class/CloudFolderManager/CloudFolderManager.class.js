@@ -17,6 +17,8 @@ class CloudFolderManager {
     EventEmitter.register(InternalEvent.WEB_CONTENT_READY, this.inFormFolderChanges.bind(this));
     EventEmitter.register(UiEvent.SERVER.ALL_UPLOADED_FILES, this.onReceiveAllUploadedFiles.bind(this));
     EventEmitter.register(UiEvent.SERVER.FILE_UPLOADED, this.onFileUploaded.bind(this));
+    EventEmitter.register(UiEvent.SERVER.FILE_DOWNLOADED, this.onFileDownloaded.bind(this));
+    EventEmitter.register(UiEvent.SERVER.FILE_DOWNLOAD_FAILED, this.onFileDownloadFailed.bind(this));
   }
 
   inFormFolderChanges() {
@@ -30,14 +32,26 @@ class CloudFolderManager {
   onReceiveAllUploadedFiles({ allUploadedFiles }) {
     allUploadedFiles.forEach(({ fileName }) => {
       const type = (fileName || '.').substr(fileName.lastIndexOf('.') + 1).toLowerCase();
-      this.files[fileName] = { fileName, type };
+      this.files[fileName] = { fileName, type, hasError: false };
     });
     this.inFormFolderChanges();
   }
 
   onFileUploaded({ fileName }) {
     const type = (fileName || '.').substr(fileName.lastIndexOf('.') + 1).toLowerCase();
-    this.files[fileName] = { fileName, type };
+    this.files[fileName] = { fileName, type, hasError: false };
+    this.inFormFolderChanges();
+  }
+
+  onFileDownloaded({ fileName }) {
+    const type = (fileName || '.').substr(fileName.lastIndexOf('.') + 1).toLowerCase();
+    this.files[fileName] = { fileName, type, hasError: false };
+    this.inFormFolderChanges();
+  }
+
+  onFileDownloadFailed({ fileName }) {
+    const type = (fileName || '.').substr(fileName.lastIndexOf('.') + 1).toLowerCase();
+    this.files[fileName] = { fileName, type, hasError: true };
     this.inFormFolderChanges();
   }
 }

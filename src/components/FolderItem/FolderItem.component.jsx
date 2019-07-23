@@ -35,7 +35,7 @@ const styles = theme => ({
   // },
 });
 
-const FolderItem = ({ fileName, type, onContextMenu }) => {
+const FolderItem = ({ fileName, type, hasError, onContextMenu }) => {
   const classes = makeStyles(styles)();
   return (
     <Card className={classes.card} onContextMenu={onContextMenu}>
@@ -46,7 +46,7 @@ const FolderItem = ({ fileName, type, onContextMenu }) => {
       />
       <CardContent className={classes.cardContent}>
         <Typography gutterBottom variant="subtitle1" align="center" display="block">
-          {fileName}
+          {fileName}{' '}{hasError && <i className="fas fa-exclamation-circle warning" /> }
         </Typography>
       </CardContent>
       {/* <CardActions className={classes.cardActions}>
@@ -61,10 +61,12 @@ const FolderItem = ({ fileName, type, onContextMenu }) => {
 FolderItem.propTypes = {
   fileName: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
+  hasError: PropTypes.bool,
   onContextMenu: PropTypes.func,
 };
 
 FolderItem.defaultProps = {
+  hasError: false,
   onContextMenu: () => {},
 };
 

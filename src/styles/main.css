@@ -34,3 +34,7 @@ html, body {
 .hide {
   opacity: 0;
 }
+
+.warning {
+  color: orange;
+}
