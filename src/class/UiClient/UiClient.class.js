@@ -44,6 +44,9 @@ class UiClient {
     ipcMain.on(InternalEvent.DOWNLOAD_FILE, (evt, { fileName }) => {
       this.downloadFile(fileName);
     });
+    ipcMain.on(InternalEvent.DROP_FILE, (evt, { path }) => {
+      this.dropFile(path);
+    });
   }
 
   uploadFile(fileName) {
@@ -69,6 +72,15 @@ class UiClient {
       this.ws.send(JSON.stringify({
         event: UiEvent.CLIENT.DOWNLOAD_FILE,
         message: { fileName },
+      }));
+    }
+  }
+
+  dropFile(path) {
+    if (this.ws.readyState === this.ws.OPEN) {
+      this.ws.send(JSON.stringify({
+        event: UiEvent.CLIENT.DROP_FILE,
+        message: { path },
       }));
     }
   }

@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 // import MockFolderItems from '../../const/mock/MockFolderItems.const';
 import InternalEvent from '../../const/InternalEvent.const';
 import TopBar from '../TopBar/TopBar.component';
+import Dropzone from '../../components/Dropzone/Dropzone.component';
 import Folder from '../../components/Folder/Folder.component';
 import Navi from '../Navi/Navi.component';
 
@@ -31,6 +32,7 @@ class Main extends React.Component {
     this.registerEvents = this.registerEvents.bind(this);
     this.onContextMenu = this.onContextMenu.bind(this);
     this.onPopoverClose = this.onPopoverClose.bind(this);
+    this.onFileDroppedIn = this.onFileDroppedIn.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
     this.deleteFile = this.deleteFile.bind(this);
     this.downloadFile = this.downloadFile.bind(this);
@@ -48,6 +50,17 @@ class Main extends React.Component {
   onPopoverClose() {
     this.setPopoverAnchor(null);
     this.setFocusedFileName('');
+  }
+
+  onFileDroppedIn(fileList) {
+    let idx = 0;
+    while (fileList[idx] !== undefined) {
+      const { path } = fileList[idx];
+      ipcRenderer.send(InternalEvent.DROP_FILE, { path });
+      idx += 1;
+    }
+    this.onPopoverClose();
+    this.switchFolder(FOLDER.LOCAL);
   }
 
   setPopoverAnchor(popoverAnchor) {
@@ -114,10 +127,12 @@ class Main extends React.Component {
       <React.Fragment>
         <CssBaseline />
         <TopBar />
-        <Folder
-          items={folderItems[currFolder]}
-          onContextMenu={this.onContextMenu}
-        />
+        <Dropzone onDrop={this.onFileDroppedIn}>
+          <Folder
+            items={folderItems[currFolder]}
+            onContextMenu={this.onContextMenu}
+          />
+        </Dropzone>
         <Popover
           open={popoverAnchor !== null}
           anchorEl={popoverAnchor}

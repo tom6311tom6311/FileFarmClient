@@ -5,6 +5,7 @@ const InternalEvent = {
   UPLOAD_FILE: 'UPLOAD_FILE',
   DELETE_FILE: 'DELETE_FILE',
   DOWNLOAD_FILE: 'DOWNLOAD_FILE',
+  DROP_FILE: 'DROP_FILE',
 };
 
 export default InternalEvent;
