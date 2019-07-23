@@ -8,11 +8,24 @@ import InternalEvent from '../../const/InternalEvent.const';
 class UiClient {
   constructor() {
     this.ws = null;
+    this.uploadFileListener = (evt, { fileName }) => {
+      this.uploadFile(fileName);
+    };
+    this.deleteFileListener = (evt, { fileName }) => {
+      this.deleteFile(fileName);
+    };
+    this.downloadFileListener = (evt, { fileName }) => {
+      this.downloadFile(fileName);
+    };
+    this.dropFileListener = (evt, { path }) => {
+      this.dropFile(path);
+    };
   }
 
   start(serverPort) {
     const errorCallback = (err) => {
       console.log(`ERROR [UiClient]: ${err}`);
+      this.stop();
       setTimeout(() => {
         this.start(serverPort);
       }, AppConfig.RETRY_TIMEOUT);
@@ -35,18 +48,19 @@ class UiClient {
   }
 
   registerInternalEventListeners() {
-    ipcMain.on(InternalEvent.UPLOAD_FILE, (evt, { fileName }) => {
-      this.uploadFile(fileName);
-    });
-    ipcMain.on(InternalEvent.DELETE_FILE, (evt, { fileName }) => {
-      this.deleteFile(fileName);
-    });
-    ipcMain.on(InternalEvent.DOWNLOAD_FILE, (evt, { fileName }) => {
-      this.downloadFile(fileName);
-    });
-    ipcMain.on(InternalEvent.DROP_FILE, (evt, { path }) => {
-      this.dropFile(path);
-    });
+    ipcMain.on(InternalEvent.UPLOAD_FILE, this.uploadFileListener);
+    ipcMain.on(InternalEvent.DELETE_FILE, this.deleteFileListener);
+    ipcMain.on(InternalEvent.DOWNLOAD_FILE, this.downloadFileListener);
+    ipcMain.on(InternalEvent.DROP_FILE, this.dropFileListener);
+  }
+
+  stop() {
+    ipcMain.removeListener(InternalEvent.UPLOAD_FILE, this.uploadFileListener);
+    ipcMain.removeListener(InternalEvent.DELETE_FILE, this.deleteFileListener);
+    ipcMain.removeListener(InternalEvent.DOWNLOAD_FILE, this.downloadFileListener);
+    ipcMain.removeListener(InternalEvent.DROP_FILE, this.dropFileListener);
+    this.ws.removeAllListeners();
+    this.ws = null;
   }
 
   uploadFile(fileName) {
