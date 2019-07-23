@@ -28,7 +28,6 @@ class CloudFolderManager {
   }
 
   onReceiveAllUploadedFiles({ allUploadedFiles }) {
-    console.log(allUploadedFiles);
     allUploadedFiles.forEach(({ fileName }) => {
       const type = (fileName || '.').substr(fileName.lastIndexOf('.') + 1).toLowerCase();
       this.files[fileName] = { fileName, type };
@@ -37,7 +36,6 @@ class CloudFolderManager {
   }
 
   onFileUploaded({ fileName }) {
-    console.log(fileName);
     const type = (fileName || '.').substr(fileName.lastIndexOf('.') + 1).toLowerCase();
     this.files[fileName] = { fileName, type };
     this.inFormFolderChanges();

@@ -1,5 +1,8 @@
 import Chokidar from 'chokidar';
 import Path from 'path';
+import fs from 'fs';
+import { exec } from 'child_process';
+import { ipcMain } from 'electron';
 import UiEvent from '../UiClient/UiEvent.const';
 import InternalEvent from '../../const/InternalEvent.const';
 import EventEmitter from '../EventEmitter/EventEmitter.class';
@@ -19,6 +22,9 @@ class LocalFolderManager {
   registerEvents() {
     EventEmitter.register(InternalEvent.WEB_CONTENT_READY, this.inFormFolderChanges.bind(this));
     EventEmitter.register(UiEvent.SERVER.GIVE_FILE_DIR, this.onGiveFileDir.bind(this));
+    ipcMain.on(InternalEvent.OPEN_FILE, (evt, { fileName }) => {
+      this.openFile(fileName);
+    });
   }
 
   inFormFolderChanges() {
@@ -51,6 +57,27 @@ class LocalFolderManager {
     const fileName = `${Path.basename(path)}`;
     delete this.files[fileName];
     this.inFormFolderChanges();
+  }
+
+  openFile(fileName) {
+    const path = Path.join(this.fileDir, fileName);
+    if (!fs.existsSync(path)) return;
+    let cmd = 'open';
+    switch (process.platform) {
+      case 'darwin':
+        cmd = 'open';
+        break;
+      case 'win32':
+        cmd = 'start';
+        break;
+      case 'win64':
+        cmd = 'start';
+        break;
+      default:
+        cmd = 'xdg-open';
+        break;
+    }
+    exec(`${cmd} ${path.replace(/ /g, '\\ ')}`);
   }
 }
 

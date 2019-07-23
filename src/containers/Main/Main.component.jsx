@@ -35,6 +35,7 @@ class Main extends React.Component {
     this.onFileDroppedIn = this.onFileDroppedIn.bind(this);
     this.uploadFile = this.uploadFile.bind(this);
     this.deleteFile = this.deleteFile.bind(this);
+    this.openFile = this.openFile.bind(this);
     this.downloadFile = this.downloadFile.bind(this);
   }
 
@@ -116,6 +117,11 @@ class Main extends React.Component {
     this.onPopoverClose();
   }
 
+  openFile(fileName) {
+    ipcRenderer.send(InternalEvent.OPEN_FILE, { fileName });
+    this.onPopoverClose();
+  }
+
   downloadFile(fileName) {
     ipcRenderer.send(InternalEvent.DOWNLOAD_FILE, { fileName });
     this.onPopoverClose();
@@ -161,6 +167,14 @@ class Main extends React.Component {
               && (
                 <ListItem button onClick={() => { this.deleteFile(currFocusedFileName); }}>
                   <ListItemText primary="Delete" />
+                </ListItem>
+              )
+            }
+            {
+              currFolder === FOLDER.LOCAL
+              && (
+                <ListItem button onClick={() => { this.openFile(currFocusedFileName); }}>
+                  <ListItemText primary="Open" />
                 </ListItem>
               )
             }
